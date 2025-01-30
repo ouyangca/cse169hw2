@@ -1,12 +1,41 @@
-#pragma once
-#include <glm/glm.hpp>
+#ifndef TRIANGLE_H
+#define TRIANGLE_H
+
+#include <vector>
 #include "Vertex.h"
+#include "core.h"
+
+
 
 class Triangle {
 public:
-    int v0, v1, v2; // Indices of vertices forming the triangle
-    glm::vec3 normal; // Face normal
+    // Constructor and Destructor
+    Triangle(bool skel_found, std::vector<Vertex*> vertices, std::vector<unsigned int> indices);
+    ~Triangle();
 
-    Triangle(int v0, int v1, int v2);
-    void computeNormal(Vertex* vertices);
+    // Draw the triangle
+    void draw(const glm::mat4& viewProjMtx, GLuint shader);
+
+    // Build the triangle (used for initialization)
+    void buildTriangle(bool skel_found, std::vector<Vertex*> *vertices, std::vector<unsigned int> *indices);
+
+private:
+    // Model matrix for transformations
+    glm::mat4 model;
+
+    // Color of the triangle
+    glm::vec3 color;
+
+    // Vertex positions, normals, and indices
+    std::vector<glm::vec3> positions;
+    std::vector<glm::vec3> normals;
+    std::vector<unsigned int> indices;
+
+    // OpenGL buffers and objects
+    GLuint VAO; // Vertex Array Object
+    GLuint VBO_positions; // Vertex Buffer Object for positions
+    GLuint VBO_normals; // Vertex Buffer Object for normals
+    GLuint EBO; // Element Buffer Object for indices
 };
+
+#endif // TRIANGLE_H
