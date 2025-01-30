@@ -8,8 +8,8 @@ LDFLAGS = -framework OpenGL -L$(BREW)/lib -lglfw
 
 RM = /bin/rm -f
 all: menv
-menv: main.o Camera.o Cube.o Shader.o Tokenizer.o Window.o Skeleton.o Joint.o DOF.o
-	$(CC) -o menv main.o Camera.o Cube.o Shader.o Tokenizer.o Skeleton.o Joint.o DOF.o Window.o $(LDFLAGS)
+menv: main.o Camera.o Cube.o Shader.o Tokenizer.o Window.o Skeleton.o Joint.o DOF.o Skin.o Vertex.o Triangle.o
+	$(CC) -o menv main.o Camera.o Cube.o Shader.o Tokenizer.o Skeleton.o Joint.o DOF.o Window.o Skin.o Vertex.o Triangle.o $(LDFLAGS)
 main.o: main.cpp include/Window.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
 Camera.o: src/Camera.cpp include/Camera.h
@@ -28,6 +28,12 @@ Skeleton.o: src/Skeleton.cpp include/Skeleton.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Skeleton.cpp
 Window.o: src/Window.cpp include/Window.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Window.cpp
+Triangle.o: src/Triangle.cpp include/Triangle.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Triangle.cpp
+Vertex.o: src/Vertex.cpp include/Vertex.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Vertex.cpp
+Skin.o: src/Skin.cpp include/Skin.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Skin.cpp
 
 
 clean: 

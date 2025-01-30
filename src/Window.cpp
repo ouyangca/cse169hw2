@@ -1,5 +1,6 @@
 #include "Window.h"
 
+
 // Window Properties
 int Window::width;
 int Window::height;
@@ -8,6 +9,7 @@ const char* Window::windowTitle = "Model Environment";
 // Objects to render
 Cube* Window::cube;
 Skeleton* Window::skeleton;
+Skin* Window::skin;
 
 // Camera Properties
 Camera* Cam;
@@ -33,13 +35,14 @@ bool Window::initializeProgram() {
     return true;
 }
 
-bool Window::initializeObjects(const char* skelFile) {
+bool Window::initializeObjects(const char* skelFile, const char* skinFile) {
     // Create a cube
     // cube = new Cube();
     skeleton = new Skeleton();
     skeleton->load(skelFile);
     // cube = new Cube(glm::vec3(-1, 0, -2), glm::vec3(1, 1, 1));
-
+    skin = new Skin(skeleton);
+    skin->Load(skinFile);
     return true;
 }
 
@@ -118,18 +121,22 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 void Window::idleCallback() {
     // Perform any updates as necessary.
     Cam->Update();
-
-    // cube->update();
     skeleton->update();
+    skin->Update();
 }
 
-void Window::displayCallback(GLFWwindow* window) {
+void Window::displayCallback(GLFWwindow* window, bool drawSkeleton, bool drawSkin) {
     // Clear the color and depth buffers.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Render the object.
     // cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    if (drawSkeleton){
+        skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    }
+    if (drawSkin){
+        skin->Draw( false, Cam->GetViewProjectMtx(), Window::shaderProgram);
+    }
 
     // Gets events, including input such as keyboard and mouse or window resizing.
     glfwPollEvents();

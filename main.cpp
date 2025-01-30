@@ -45,11 +45,24 @@ void print_versions() {
 
 int main(int argc, char *argv[]) {
 
-    const char* skelFile = "test.skel"; // Default skel file
-    if (argc > 1) {
-        skelFile = argv[1]; // Use the provided .skel file name from command-line arguments
+    const char* skelFile = nullptr;
+    const char* skinFile = nullptr;
+    bool skel_found = false;
+    bool skin_found = false;
+
+    for (int i = 1; i < argc; i++) {
+        std::string arg = argv[i];
+        if (arg.find(".skel") != std::string::npos) {
+            skelFile = argv[i];
+            skel_found = true;
+        } else if (arg.find(".skin") != std::string::npos) {
+            skinFile = argv[i];
+            skin_found = true;
+        }
     }
 
+
+    // Now skelFile and skinFile can be used accordingly
 
     // Create the GLFW window.
     GLFWwindow* window = Window::createWindow(800, 600);
@@ -65,12 +78,30 @@ int main(int argc, char *argv[]) {
     // Initialize the shader program; exit if initialization fails.
     if (!Window::initializeProgram()) exit(EXIT_FAILURE);
     // Initialize objects/pointers for rendering; exit if initialization fails.
-    if (!Window::initializeObjects(skelFile)) exit(EXIT_FAILURE);
+    
+
+     if (!skelFile) {
+            std::cout << "SKELETON FILE NOT FOUND" << std::endl;
+            exit(EXIT_FAILURE);
+    }
+
+
+    if (!skinFile) {
+        std::cout << "SKIN FILE NOT FOUND" << std::endl;
+        
+    }
+
+    if (!Window::initializeObjects(skelFile, skinFile)) exit(EXIT_FAILURE);
+
+
 
     // Loop while GLFW window should stay open.
     while (!glfwWindowShouldClose(window)) {
         // Main render display callback. Rendering of objects is done here.
-        Window::displayCallback(window);
+
+       
+        Window::displayCallback(window, skel_found, skin_found);
+        
 
         // Idle callback. Updating objects, etc. can be done here.
         Window::idleCallback();

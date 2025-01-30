@@ -12,6 +12,7 @@ Joint::Joint()
 	boxmax = { 0.1f, 0.1f, 0.1f };
 	L = glm::mat4(1.0f); // local matrix
 	W = glm::mat4(1.0f); // world matrix
+	inverseB = glm::mat4(1.0f); // 
 	DOF* DOFx = new DOF();
 	DOF* DOFy = new DOF();
 	DOF* DOFz = new DOF();
@@ -114,7 +115,7 @@ bool Joint::Load(Tokenizer &token) {
         }
         else if(strcmp(temp,"}")==0){
             cube = new Cube(boxmin, boxmax);
-            PrintValues();
+            // PrintValues();
             return true;
             } 
         else token.SkipLine(); // Unrecognized token

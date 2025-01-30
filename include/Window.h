@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "core.h"
 #include "Skeleton.h"
+#include "Skin.h"
 
 class Window {
 public:
@@ -13,6 +14,7 @@ public:
     static int height;
     static const char* windowTitle;
     static Skeleton* skeleton;
+    static Skin* skin;
 
     // Objects to render
     static Cube* cube;
@@ -22,7 +24,7 @@ public:
 
     // Act as Constructors and desctructors
     static bool initializeProgram();
-    static bool initializeObjects(const char* skelFile);
+    static bool initializeObjects(const char* skelFile, const char* skinFile);
     static void cleanUp();
 
     // for the Window
@@ -31,7 +33,7 @@ public:
 
     // update and draw functions
     static void idleCallback();
-    static void displayCallback(GLFWwindow*);
+    static void displayCallback(GLFWwindow*, bool drawSkeleton, bool drawSkin);
 
     // helper to reset the camera
     static void resetCamera();
