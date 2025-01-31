@@ -10,6 +10,8 @@ const char* Window::windowTitle = "Model Environment";
 Cube* Window::cube;
 Skeleton* Window::skeleton;
 Skin* Window::skin;
+bool Window::skel_found;
+bool Window::skin_found;
 
 // Camera Properties
 Camera* Cam;
@@ -35,14 +37,43 @@ bool Window::initializeProgram() {
     return true;
 }
 
-bool Window::initializeObjects(const char* skelFile, const char* skinFile) {
+bool Window::initializeObjects(bool skel_found, bool skin_found, const char* skelFile, const char* skinFile) {
     // Create a cube
     // cube = new Cube();
-    skeleton = new Skeleton();
-    skeleton->load(skelFile);
-    // cube = new Cube(glm::vec3(-1, 0, -2), glm::vec3(1, 1, 1));
-    skin = new Skin(skeleton);
-    skin->Load(skinFile);
+
+    skeleton = nullptr;
+
+    Window::skel_found = skel_found;
+    Window::skin_found = skin_found;
+    if (skel_found){
+        std::cout << "YAY Skeleton file found. " << std::endl;
+    }
+     if (skin_found){
+        std::cout << "YAY Skin file found. " << std::endl;
+     }
+
+    if (skel_found && !skin_found){
+        skeleton = new Skeleton();
+        skeleton->load(skelFile);
+        
+    }
+    
+    else if (skel_found && skin_found){
+        // bool binding = true;
+    // std::cout << "seg2" << std::endl;
+        skeleton = new Skeleton();
+        skeleton->load(skelFile);
+        skin = new Skin(true, skeleton);
+        skin->Load(skinFile);
+
+    }
+    else if (!skel_found && skin_found){
+    std::cout << "seg 1" << std::endl;
+
+        skin = new Skin(false, skeleton);
+        skin->Load(skinFile);
+    }
+    
     return true;
 }
 
@@ -121,22 +152,57 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 void Window::idleCallback() {
     // Perform any updates as necessary.
     Cam->Update();
-    skeleton->update();
-    skin->Update();
+    
+    
+    if (skel_found && !skin_found){
+        skeleton->update();
+    }
+    else if (skel_found && skin_found){
+    std::cout << "seg 1" << std::endl;
+
+        skeleton->update();
+    std::cout << "seg 1" << std::endl;
+
+       skin->Update(true);
+    }
+    else if (!skel_found && skin_found){
+        
+        skeleton->update();
+    std::cout << "seg 1" << std::endl;
+
+        skin->Update(false);
+    }
+    
 }
 
-void Window::displayCallback(GLFWwindow* window, bool drawSkeleton, bool drawSkin) {
+void Window::displayCallback(GLFWwindow* window) {
     // Clear the color and depth buffers.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Render the object.
     // cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    if (drawSkeleton){
+    // if (drawSkeleton){
+    //     skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    // }
+    // if (drawSkin){
+    //     skin->Draw( false, Cam->GetViewProjectMtx(), Window::shaderProgram);
+    // }
+    if (skel_found && !skin_found){
         skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
     }
-    if (drawSkin){
-        skin->Draw( false, Cam->GetViewProjectMtx(), Window::shaderProgram);
+    else if (skel_found && skin_found){
+    // std::cout << "draw" << std::endl;
+        skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+        
+       skin->DrawTriangle(Cam->GetViewProjectMtx(), Window::shaderProgram);
     }
+    else if (!skel_found && skin_found){
+        // std::cout << "skin is found" << std::endl;
+    std::cout << "triangle 1" << std::endl;
+
+        skin->DrawTriangle(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    }
+    
 
     // Gets events, including input such as keyboard and mouse or window resizing.
     glfwPollEvents();

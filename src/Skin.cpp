@@ -2,9 +2,18 @@
 #include "glm/gtx/string_cast.hpp"
 #include <iostream>
 
-Skin::Skin(Skeleton* skel)
+Skin::Skin(bool skel_found, Skeleton* skel)
 {
-    skeleton = skel;
+    
+    if (skel_found){
+    std::cout << "Binding Complete w/ skeleton."  << std::endl;
+        
+        skeleton = skel;
+        binding = true;
+    } 
+    else {binding = false;
+    std::cout << "no binding" << std::endl;
+    }
     // Generate a vertex array (VAO), two vertex buffer objects (VBO), and EBO.
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO_positions);
@@ -93,7 +102,10 @@ bool Skin::Load(const char* filename)
             JointID = tknizer->GetFloat();
             weight = tknizer->GetFloat();
             vertices[i]->weights.push_back(weight);
+            if (binding){
             vertices[i]->joints.push_back(skeleton->joints[JointID]);
+
+            }
         }
     }
 
@@ -130,7 +142,8 @@ bool Skin::Load(const char* filename)
         dx = tknizer->GetFloat();
         dy = tknizer->GetFloat();
         dz = tknizer->GetFloat();
-        skeleton->joints[i]->inverseB = glm::inverse(
+        if (binding){
+            skeleton->joints[i]->inverseB = glm::inverse(
             glm::mat4(
                 ax, ay, az, 0.0f,
                 bx, by, bz, 0.0f, 
@@ -138,6 +151,9 @@ bool Skin::Load(const char* filename)
                 dx, dy, dz, 1.0f
             )
         );
+
+            }
+        
     }
 
     tknizer->Close();
@@ -145,38 +161,46 @@ bool Skin::Load(const char* filename)
     return true;
 }
 
-void Skin::Update()
+void Skin::Update(bool binding)
 {
     // Compute matrix for each joint of the current vertex;
     // Compute blended world space positions & normals for each vertex;
-    Vertex* curV;
-    glm::vec3 curPosition;
-    glm::vec3 curNormal;
-    glm::mat4 M;
-    glm::vec4 transformedPosition;
-    glm::vec4 transformedNormal;
+    if (binding){
+        Vertex* curV;
+        glm::vec3 curPosition;
+        glm::vec3 curNormal;
+        glm::mat4 M;
+        glm::vec4 transformedPosition;
+        glm::vec4 transformedNormal;
 
-    for (int i = 0; i < vertexNum; i++) {
-        curV = vertices[i];
-        curPosition = curV->position;
-        curNormal = curV->normal;
-        transformedPosition = glm::vec4(0.0f);
-        transformedNormal = glm::vec4(0.0f);
+        for (int i = 0; i < vertexNum; i++) {
+            curV = vertices[i];
+            curPosition = curV->position;
+            curNormal = curV->normal;
+            transformedPosition = glm::vec4(0.0f);
+            transformedNormal = glm::vec4(0.0f);
 
-        for (int j = 0; j < curV->joints.size(); j++) {
-            M = curV->weights[j] * curV->joints[j]->W * curV->joints[j]->inverseB;
-            transformedPosition += M * glm::vec4(curPosition, 1.0f);
-            transformedNormal += M * glm::vec4(curNormal, 0.0f);
+            for (int j = 0; j < curV->joints.size(); j++) {
+                M = curV->weights[j] * curV->joints[j]->W * curV->joints[j]->inverseB;
+                transformedPosition += M * glm::vec4(curPosition, 1.0f);
+                transformedNormal += M * glm::vec4(curNormal, 0.0f);
+            }
+
+            shaderPositions[i] = glm::vec3(transformedPosition);
+            transformedNormal = glm::normalize(transformedNormal);
+            shaderNormals[i] = glm::vec3(transformedNormal);
         }
-
-        shaderPositions[i] = glm::vec3(transformedPosition);
-        transformedNormal = glm::normalize(transformedNormal);
-        shaderNormals[i] = glm::vec3(transformedNormal);
     }
+    
+    
 }
 
 void Skin::Draw(bool isDrawOriginalSkin, const glm::mat4& viewProjMtx, GLuint shader)
 {
+    // Draw(bool isDrawOriginalSkin, std::vector<glm::vec3> positions, 
+	// 		std::vector<glm::vec3> normals, std::vector<unsigned int> indices, 
+	// 		const glm::mat4& viewProjMtx, GLuint shader);
+    
     glm::mat4 modelMtx = glm::mat4(1.0f);
     glm::mat4 mvpMtx = viewProjMtx * modelMtx;
 
@@ -184,8 +208,10 @@ void Skin::Draw(bool isDrawOriginalSkin, const glm::mat4& viewProjMtx, GLuint sh
     glUseProgram(shader);
 
     // get the locations and send the uniforms to the shader
-    glUniformMatrix4fv(glGetUniformLocation(shader, "ModelMtx"), 1, false, (float*)&modelMtx);
-    glUniformMatrix4fv(glGetUniformLocation(shader, "ModelViewProjectionMtx"), 1, GL_FALSE, (float*)&mvpMtx);
+    // glUniformMatrix4fv(glGetUniformLocation(shader, "ModelMtx"), 1, false, (float*)&viewProjMtx);
+    glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"),1, false, (float*)&viewProjMtx);
+    glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&modelMtx);
+    // glUniformMatrix4fv(glGetUniformLocation(shader, "ModelViewProjectionMtx"), 1, GL_FALSE, (float*)&modelMtx);
 
     
     // rebind and resend new data after transforming positions and normals
@@ -219,4 +245,21 @@ void Skin::Draw(bool isDrawOriginalSkin, const glm::mat4& viewProjMtx, GLuint sh
     // Unbind the VAO and shader program
     glBindVertexArray(0);
     glUseProgram(0);
+}
+
+void Skin::DrawTriangle(const glm::mat4& viewProjMtx, GLuint shader){
+    // Draw(bool isDrawOriginalSkin, std::vector<glm::vec3> positions, 
+	// 		std::vector<glm::vec3> normals, std::vector<unsigned int> indices, 
+	// 		const glm::mat4& viewProjMtx, GLuint shader);
+    
+    std::cout << "init 1" << std::endl;
+
+        triangles = new Triangle(binding, shaderPositions, shaderNormals, shaderIndices);
+    std::cout << "init 2" << std::endl;
+    
+
+    triangles->draw(viewProjMtx, shader);
+    std::cout << "init 1" << std::endl;
+
+    // triangles->Delete();
 }

@@ -34,6 +34,8 @@
 
 #pragma once
 #include "Vertex.h"
+#include "Triangle.h"
+
 #include "Tokenizer.h"
 #include <vector>
 #include "Skeleton.h"
@@ -45,6 +47,8 @@ public:
 	std::vector<Vertex*> vertices;
 	// The skeleton associated with this skin; used for linking joints
 	Skeleton* skeleton; 
+	Triangle* triangles;
+	bool binding;
 
 	// shader-related
 	GLuint VAO, VBO_positions, VBO_normals, EBO;
@@ -56,12 +60,13 @@ public:
 
 
 
-	Skin(Skeleton* skel);
+	Skin(bool skel_found, Skeleton* skel);
 	~Skin();
 
 	void BindBuffer();
-	bool Load(const char* filename = "assets/wasp.skin");
-	void Update();
+	bool Load(const char* filename);
+	void Update(bool binding);
 	void Draw(bool isDrawOriginalSkin, const glm::mat4& viewProjMtx, GLuint shader);
+	void DrawTriangle(const glm::mat4& viewProjMtx, GLuint shader);
 
 };

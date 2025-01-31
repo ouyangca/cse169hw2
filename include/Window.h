@@ -13,6 +13,9 @@ public:
     static int width;
     static int height;
     static const char* windowTitle;
+    static bool skel_found;
+    static bool skin_found;
+
     static Skeleton* skeleton;
     static Skin* skin;
 
@@ -24,7 +27,7 @@ public:
 
     // Act as Constructors and desctructors
     static bool initializeProgram();
-    static bool initializeObjects(const char* skelFile, const char* skinFile);
+    static bool initializeObjects(bool skel_found, bool skin_found, const char* skelFile, const char* skinFile);
     static void cleanUp();
 
     // for the Window
@@ -33,7 +36,7 @@ public:
 
     // update and draw functions
     static void idleCallback();
-    static void displayCallback(GLFWwindow*, bool drawSkeleton, bool drawSkin);
+    static void displayCallback(GLFWwindow*);
 
     // helper to reset the camera
     static void resetCamera();

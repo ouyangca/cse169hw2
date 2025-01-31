@@ -12,3 +12,4 @@ void Vertex::setPositions(float x, float y, float z) {
 void Vertex::setNormals(float nx, float ny, float nz) {
     normal = glm::vec3(nx, ny, nz);
 }
+

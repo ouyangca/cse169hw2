@@ -61,6 +61,14 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    if (skel_found){
+        std::cout << "YAY Skeleton file found. " << std::endl;
+    }
+     if (skin_found){
+        std::cout << "YAY Skin file found. " << std::endl;
+
+    }
+
 
     // Now skelFile and skinFile can be used accordingly
 
@@ -81,17 +89,18 @@ int main(int argc, char *argv[]) {
     
 
      if (!skelFile) {
-            std::cout << "SKELETON FILE NOT FOUND" << std::endl;
-            exit(EXIT_FAILURE);
+            std::cout << "TAT SKELETON FILE NOT FOUND" << std::endl;
     }
 
 
     if (!skinFile) {
-        std::cout << "SKIN FILE NOT FOUND" << std::endl;
+        std::cout << "TAT SKIN FILE NOT FOUND" << std::endl;
         
     }
 
-    if (!Window::initializeObjects(skelFile, skinFile)) exit(EXIT_FAILURE);
+
+
+    if (!Window::initializeObjects(skel_found, skin_found, skelFile, skinFile )) exit(EXIT_FAILURE);
 
 
 
@@ -100,7 +109,7 @@ int main(int argc, char *argv[]) {
         // Main render display callback. Rendering of objects is done here.
 
        
-        Window::displayCallback(window, skel_found, skin_found);
+        Window::displayCallback(window);
         
 
         // Idle callback. Updating objects, etc. can be done here.
