@@ -1,8 +1,8 @@
 #include "Triangle.h"
 #include <iostream>
 
-Triangle::Triangle(bool skel_found, std::vector<glm::vec3> positions, 
-    std::vector<glm::vec3> normals, std::vector<unsigned int> indices) {
+Triangle::Triangle(bool skel_found, std::vector<glm::vec3> s_positions, 
+    std::vector<glm::vec3> s_normals, std::vector<unsigned int> s_indices) {
     // Model matrix.
     model = glm::mat4(1.0f);
 
@@ -24,6 +24,12 @@ Triangle::Triangle(bool skel_found, std::vector<glm::vec3> positions,
 
     //     }
     // }
+
+    positions = s_positions;
+    normals = s_normals;
+    indices = s_indices;
+
+
 
 
     // Generate a vertex array (VAO) and two vertex buffer objects (VBO).

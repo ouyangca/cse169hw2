@@ -19,6 +19,8 @@ public:
     glm::mat4 L, W;                              // Local and world matrices
     glm::mat4 inverseB;
     char JointName[256];                         // Name of the joint
+    void PrintHierarchy(int depth = 0) const;
+    std::vector<DOF*> JointDOF;                  // Degrees of freedom (DOFs) for the joint
 
 
 
@@ -28,7 +30,6 @@ private:
     glm::vec3 boxmin, boxmax;                    // Bounding box min and max
     glm::vec3 pose;
     Cube* cube;                                  // Cube for visualization
-    std::vector<DOF*> JointDOF;                  // Degrees of freedom (DOFs) for the joint
 
     // char JointName[256];                         // Name of the joint
 };

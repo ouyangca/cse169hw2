@@ -15,6 +15,8 @@ public:
     static const char* windowTitle;
     static bool skel_found;
     static bool skin_found;
+    static int selectedJoint;  // Global or static variable to track the selected joint
+    static int selectedDOF;
 
     static Skeleton* skeleton;
     static Skin* skin;
@@ -29,6 +31,9 @@ public:
     static bool initializeProgram();
     static bool initializeObjects(bool skel_found, bool skin_found, const char* skelFile, const char* skinFile);
     static void cleanUp();
+    static void printDOF();
+
+
 
     // for the Window
     static GLFWwindow* createWindow(int width, int height);

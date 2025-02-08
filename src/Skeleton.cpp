@@ -69,3 +69,30 @@ glm::mat4 Skeleton::GetWorldMatrix(int jointIndex) {
     }
     return joints[jointIndex]->W; // Return world matrix
 }
+
+void Skeleton::PrintDOF() {
+    for (int jointIndex = 0; jointIndex < joints.size(); jointIndex++) {
+        std::cout << "Joint Index: " << jointIndex << "\n";
+        joints[jointIndex]->PrintValues();
+    }
+    
+}
+
+
+
+void Skeleton::SetDOF(int jointIndex, int dofIndex, float newValue) {
+    if (jointIndex < 0 || jointIndex >= joints.size()) {
+        std::cerr << "Invalid joint index!" << std::endl;
+        return;
+    }
+
+    Joint* joint = joints[jointIndex];
+
+    if (dofIndex < 0 || dofIndex >= joint->JointDOF.size()) {
+        std::cerr << "Invalid DOF index!" << std::endl;
+        return;
+    }
+
+    joint->JointDOF[dofIndex]->SetValue(newValue);
+    std::cout << "Updated DOF[" << dofIndex << "] of Joint[" << jointIndex << "] to " << newValue << std::endl;
+}

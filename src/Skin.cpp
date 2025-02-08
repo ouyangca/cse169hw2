@@ -15,47 +15,47 @@ Skin::Skin(bool skel_found, Skeleton* skel)
     std::cout << "no binding" << std::endl;
     }
     // Generate a vertex array (VAO), two vertex buffer objects (VBO), and EBO.
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO_positions);
-    glGenBuffers(1, &VBO_normals);
-    glGenBuffers(1, &EBO);
+    // glGenVertexArrays(1, &VAO);
+    // glGenBuffers(1, &VBO_positions);
+    // glGenBuffers(1, &VBO_normals);
+    // glGenBuffers(1, &EBO);
 }
 
 Skin::~Skin()
 {
     // Delete the VBOs and the VAO.
-    glDeleteBuffers(1, &VBO_positions);
-    glDeleteBuffers(1, &VBO_normals);
-    glDeleteBuffers(1, &EBO);
-    glDeleteVertexArrays(1, &VAO);
+    // glDeleteBuffers(1, &VBO_positions);
+    // glDeleteBuffers(1, &VBO_normals);
+    // glDeleteBuffers(1, &EBO);
+    // glDeleteVertexArrays(1, &VAO);
 }
 
 void Skin::BindBuffer()
 {
-    // Bind to the VAO.
-    glBindVertexArray(VAO);
+    // // Bind to the VAO.
+    // glBindVertexArray(VAO);
 
-    // Bind to the first VBO - positions of vertices
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_positions);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * shaderPositions.size(), shaderPositions.data(), GL_STATIC_DRAW);
-    GLuint posLoc = 0;
-    glEnableVertexAttribArray(posLoc);
-    glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    // // Bind to the first VBO - positions of vertices
+    // glBindBuffer(GL_ARRAY_BUFFER, VBO_positions);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * shaderPositions.size(), shaderPositions.data(), GL_STATIC_DRAW);
+    // GLuint posLoc = 0;
+    // glEnableVertexAttribArray(posLoc);
+    // glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
-    // Bind to the second VBO - normals of vertices
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_normals);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * shaderNormals.size(), shaderNormals.data(), GL_STATIC_DRAW);
-    GLuint normLoc = 1;
-    glEnableVertexAttribArray(normLoc);
-    glVertexAttribPointer(normLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    // // Bind to the second VBO - normals of vertices
+    // glBindBuffer(GL_ARRAY_BUFFER, VBO_normals);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * shaderNormals.size(), shaderNormals.data(), GL_STATIC_DRAW);
+    // GLuint normLoc = 1;
+    // glEnableVertexAttribArray(normLoc);
+    // glVertexAttribPointer(normLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
-    // Bind the EBO to the bound VAO and send the data
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * shaderIndices.size(), shaderIndices.data(), GL_STATIC_DRAW);
+    // // Bind the EBO to the bound VAO and send the data
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * shaderIndices.size(), shaderIndices.data(), GL_STATIC_DRAW);
 
-    // Unbind the VBOs.
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    // // Unbind the VBOs.
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindVertexArray(0);
 }
 
 bool Skin::Load(const char* filename)
@@ -197,54 +197,54 @@ void Skin::Update(bool binding)
 
 void Skin::Draw(bool isDrawOriginalSkin, const glm::mat4& viewProjMtx, GLuint shader)
 {
-    // Draw(bool isDrawOriginalSkin, std::vector<glm::vec3> positions, 
-	// 		std::vector<glm::vec3> normals, std::vector<unsigned int> indices, 
-	// 		const glm::mat4& viewProjMtx, GLuint shader);
+//     // Draw(bool isDrawOriginalSkin, std::vector<glm::vec3> positions, 
+// 	// 		std::vector<glm::vec3> normals, std::vector<unsigned int> indices, 
+// 	// 		const glm::mat4& viewProjMtx, GLuint shader);
     
-    glm::mat4 modelMtx = glm::mat4(1.0f);
-    glm::mat4 mvpMtx = viewProjMtx * modelMtx;
+//     glm::mat4 modelMtx = glm::mat4(1.0f);
+//     glm::mat4 mvpMtx = viewProjMtx * modelMtx;
 
-    // actiavte the shader program
-    glUseProgram(shader);
+//     // actiavte the shader program
+//     glUseProgram(shader);
 
-    // get the locations and send the uniforms to the shader
-    // glUniformMatrix4fv(glGetUniformLocation(shader, "ModelMtx"), 1, false, (float*)&viewProjMtx);
-    glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"),1, false, (float*)&viewProjMtx);
-    glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&modelMtx);
-    // glUniformMatrix4fv(glGetUniformLocation(shader, "ModelViewProjectionMtx"), 1, GL_FALSE, (float*)&modelMtx);
+//     // get the locations and send the uniforms to the shader
+//     // glUniformMatrix4fv(glGetUniformLocation(shader, "ModelMtx"), 1, false, (float*)&viewProjMtx);
+//     glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"),1, false, (float*)&viewProjMtx);
+//     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&modelMtx);
+//     // glUniformMatrix4fv(glGetUniformLocation(shader, "ModelViewProjectionMtx"), 1, GL_FALSE, (float*)&modelMtx);
 
     
-    // rebind and resend new data after transforming positions and normals
-    // Rebind the VAO
-    glBindVertexArray(VAO);
+//     // rebind and resend new data after transforming positions and normals
+//     // Rebind the VAO
+//     glBindVertexArray(VAO);
 
-    // Update the first VBO - positions of vertices - then unbind
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_positions);
-    if (isDrawOriginalSkin) {
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * bindingPositions.size(), bindingPositions.data(), GL_STATIC_DRAW);
-    }
-    else {
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * shaderPositions.size(), shaderPositions.data(), GL_STATIC_DRAW);
+//     // Update the first VBO - positions of vertices - then unbind
+//     glBindBuffer(GL_ARRAY_BUFFER, VBO_positions);
+//     if (isDrawOriginalSkin) {
+//         glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * bindingPositions.size(), bindingPositions.data(), GL_STATIC_DRAW);
+//     }
+//     else {
+//         glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * shaderPositions.size(), shaderPositions.data(), GL_STATIC_DRAW);
 
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//     }
+//     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // Update the second VBO - normals of vertices - then unbind
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_normals);
-    if (isDrawOriginalSkin) {
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * bindingNormals.size(), bindingNormals.data(), GL_STATIC_DRAW);
-    }
-    else {
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * shaderNormals.size(), shaderNormals.data(), GL_STATIC_DRAW);
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//     // Update the second VBO - normals of vertices - then unbind
+//     glBindBuffer(GL_ARRAY_BUFFER, VBO_normals);
+//     if (isDrawOriginalSkin) {
+//         glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * bindingNormals.size(), bindingNormals.data(), GL_STATIC_DRAW);
+//     }
+//     else {
+//         glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * shaderNormals.size(), shaderNormals.data(), GL_STATIC_DRAW);
+//     }
+//     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // draw the points using triangles, indexed with the EBO
-    glDrawElements(GL_TRIANGLES, shaderIndices.size(), GL_UNSIGNED_INT, 0);
+//     // draw the points using triangles, indexed with the EBO
+//     glDrawElements(GL_TRIANGLES, shaderIndices.size(), GL_UNSIGNED_INT, 0);
 
-    // Unbind the VAO and shader program
-    glBindVertexArray(0);
-    glUseProgram(0);
+//     // Unbind the VAO and shader program
+//     glBindVertexArray(0);
+//     glUseProgram(0);
 }
 
 void Skin::DrawTriangle(const glm::mat4& viewProjMtx, GLuint shader){
@@ -252,14 +252,14 @@ void Skin::DrawTriangle(const glm::mat4& viewProjMtx, GLuint shader){
 	// 		std::vector<glm::vec3> normals, std::vector<unsigned int> indices, 
 	// 		const glm::mat4& viewProjMtx, GLuint shader);
     
-    std::cout << "init 1" << std::endl;
+    // std::cout << "init 1" << std::endl;
 
         triangles = new Triangle(binding, shaderPositions, shaderNormals, shaderIndices);
-    std::cout << "init 2" << std::endl;
+    // std::cout << "init 2" << std::endl;
     
 
     triangles->draw(viewProjMtx, shader);
-    std::cout << "init 1" << std::endl;
+    // std::cout << "init 1" << std::endl;
 
     // triangles->Delete();
 }

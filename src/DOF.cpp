@@ -15,6 +15,8 @@ void DOF::SetValue(float val) {
     else if (maxLimit < val) value = maxLimit;
 }
 
+
+
 // Get the current value of the DOF (rotation angle)
 float DOF::GetValue()  {
     return value;

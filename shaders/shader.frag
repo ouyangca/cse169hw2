@@ -6,7 +6,7 @@ in vec3 fragNormal;
 // Uniforms for lighting
 uniform vec3 AmbientColor = vec3(0.2);
 uniform vec3 LightDirection = normalize(vec3(1, 5, 2));  // First light source
-uniform vec3 LightColor = vec3(1);
+uniform vec3 LightColor = vec3(1, 0, 0);
 
 uniform vec3 LightDirection2 = normalize(vec3(-2, 3, -1)); // Second light source
 uniform vec3 LightColor2 = vec3(0.3, 0.1, 0.6);  // Second light color

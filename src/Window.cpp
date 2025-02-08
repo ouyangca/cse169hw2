@@ -12,7 +12,8 @@ Skeleton* Window::skeleton;
 Skin* Window::skin;
 bool Window::skel_found;
 bool Window::skin_found;
-
+int Window::selectedJoint = 0;  // Global or static variable to track the selected joint
+int Window::selectedDOF = 0;
 // Camera Properties
 Camera* Cam;
 
@@ -45,12 +46,12 @@ bool Window::initializeObjects(bool skel_found, bool skin_found, const char* ske
 
     Window::skel_found = skel_found;
     Window::skin_found = skin_found;
-    if (skel_found){
-        std::cout << "YAY Skeleton file found. " << std::endl;
-    }
-     if (skin_found){
-        std::cout << "YAY Skin file found. " << std::endl;
-     }
+    // if (skel_found){
+    //     // std::cout << "YAY Skeleton file found. " << std::endl;
+    // }
+    //  if (skin_found){
+    //     // std::cout << "YAY Skin file found. " << std::endl;
+    //  }
 
     if (skel_found && !skin_found){
         skeleton = new Skeleton();
@@ -68,7 +69,7 @@ bool Window::initializeObjects(bool skel_found, bool skin_found, const char* ske
 
     }
     else if (!skel_found && skin_found){
-    std::cout << "seg 1" << std::endl;
+    // std::cout << "seg 1" << std::endl;
 
         skin = new Skin(false, skeleton);
         skin->Load(skinFile);
@@ -158,17 +159,11 @@ void Window::idleCallback() {
         skeleton->update();
     }
     else if (skel_found && skin_found){
-    std::cout << "seg 1" << std::endl;
-
         skeleton->update();
-    std::cout << "seg 1" << std::endl;
-
        skin->Update(true);
     }
     else if (!skel_found && skin_found){
-        
         skeleton->update();
-    std::cout << "seg 1" << std::endl;
 
         skin->Update(false);
     }
@@ -192,15 +187,17 @@ void Window::displayCallback(GLFWwindow* window) {
     }
     else if (skel_found && skin_found){
     // std::cout << "draw" << std::endl;
-        skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+        //skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
         
        skin->DrawTriangle(Cam->GetViewProjectMtx(), Window::shaderProgram);
     }
     else if (!skel_found && skin_found){
         // std::cout << "skin is found" << std::endl;
-    std::cout << "triangle 1" << std::endl;
+    // std::cout << "triangle 1" << std::endl;
 
         skin->DrawTriangle(Cam->GetViewProjectMtx(), Window::shaderProgram);
+        // std::cout << "draw is done" << std::endl;
+
     }
     
 
@@ -214,6 +211,10 @@ void Window::displayCallback(GLFWwindow* window) {
 void Window::resetCamera() {
     Cam->Reset();
     Cam->SetAspect(float(Window::width) / float(Window::height));
+}
+
+void Window::printDOF(){
+    skeleton->PrintDOF();
 }
 
 // callbacks - for Interaction
@@ -232,6 +233,50 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 
             case GLFW_KEY_R:
                 resetCamera();
+                break;
+
+            case GLFW_KEY_D:
+                printDOF();
+                break;
+
+
+
+             case GLFW_KEY_E:
+                std::cout << "Edit DOF Mode: Use J/K to select joints, U/I to select DOFs, and +/- to modify values." << std::endl;
+                break;
+
+            case GLFW_KEY_J:  // Move to previous joint
+                selectedJoint = std::max(0, selectedJoint - 1);
+                std::cout << "Selected Joint: " << selectedJoint << std::endl;
+                break;
+
+            case GLFW_KEY_K:  // Move to next joint
+                selectedJoint = std::min((int)skeleton->joints.size() - 1, selectedJoint + 1);
+                std::cout << "Selected Joint: " << selectedJoint << std::endl;
+                break;
+
+            case GLFW_KEY_U:  // Move to previous DOF
+                selectedDOF = std::max(0, selectedDOF - 1);
+                std::cout << "Selected DOF: " << selectedDOF << std::endl;
+                break;
+
+            case GLFW_KEY_I:  // Move to next DOF
+                selectedDOF = std::min((int)skeleton->joints[selectedJoint]->JointDOF.size() - 1, selectedDOF + 1);
+                std::cout << "Selected DOF: " << selectedDOF << std::endl;
+                break;
+
+            case GLFW_KEY_EQUAL:  // Increase DOF value ('+' key)
+                if (!skeleton->joints[selectedJoint]->JointDOF.empty()) {
+                    float newValue = skeleton->joints[selectedJoint]->JointDOF[selectedDOF]->GetValue() + 0.1f;
+                    skeleton->SetDOF(selectedJoint, selectedDOF, newValue);
+                }
+                break;
+
+            case GLFW_KEY_MINUS:  // Decrease DOF value ('-' key)
+                if (!skeleton->joints[selectedJoint]->JointDOF.empty()) {
+                    float newValue = skeleton->joints[selectedJoint]->JointDOF[selectedDOF]->GetValue() - 0.1f;
+                    skeleton->SetDOF(selectedJoint, selectedDOF, newValue);
+                }
                 break;
 
             default:

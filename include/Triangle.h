@@ -13,8 +13,8 @@ public:
     // Draw(bool isDrawOriginalSkin, std::vector<glm::vec3> positions, 
 	// 		std::vector<glm::vec3> normals, std::vector<unsigned int> indices, 
 	// 		const glm::mat4& viewProjMtx, GLuint shader);
-    Triangle(bool skel_found, std::vector<glm::vec3> positions, 
-			std::vector<glm::vec3> normals,std::vector<unsigned int> indices);
+    Triangle(bool skel_found, std::vector<glm::vec3> s_positions, 
+			std::vector<glm::vec3> s_normals,std::vector<unsigned int> indices);
     ~Triangle();
 
     // Draw the triangle

@@ -161,3 +161,61 @@ void Joint::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
     }
 
 }
+
+// void Joint::PrintHierarchy(int depth) const {
+//     // Indentation for hierarchy visualization
+//     std::string indent(depth * 2, ' ');
+
+//     std::cout << indent << "Joint Name: " << JointName << "\n";
+//     std::cout << indent << "Offset: "
+//               << "x = " << offset.x << ", y = " << offset.y << ", z = " << offset.z << "\n";
+//     std::cout << indent << "BoxMin: "
+//               << "x = " << boxmin.x << ", y = " << boxmin.y << ", z = " << boxmin.z << "\n";
+//     std::cout << indent << "BoxMax: "
+//               << "x = " << boxmax.x << ", y = " << boxmax.y << ", z = " << boxmax.z << "\n";
+//     std::cout << indent << "DOF Limits:\n";
+//     std::cout << indent << "  RotX: Min = " << JointDOF[0]->GetMinLimit() << ", Max = " << JointDOF[0]->GetMaxLimit() << "\n";
+//     std::cout << indent << "  RotY: Min = " << JointDOF[1]->GetMinLimit() << ", Max = " << JointDOF[1]->GetMaxLimit() << "\n";
+//     std::cout << indent << "  RotZ: Min = " << JointDOF[2]->GetMinLimit() << ", Max = " << JointDOF[2]->GetMaxLimit() << "\n";
+//     std::cout << indent << "Pose: "
+//               << "x = " << pose.x << ", y = " << pose.y << ", z = " << pose.z << "\n";
+//     std::cout << indent << "Children: " << children.size() << "\n\n";
+
+
+//     for (auto* child : children) {
+//         child->PrintHierarchy(depth + 1);
+//     }
+// }
+
+void Joint::PrintHierarchy(int depth) const {
+    // Indentation for hierarchy visualization
+    std::string indent(depth * 2, ' ');
+
+    std::cout << indent << "Joint Name: " << JointName << "\n";
+    std::cout << indent << "Offset: "
+              << "x = " << offset.x << ", y = " << offset.y << ", z = " << offset.z << "\n";
+    std::cout << indent << "BoxMin: "
+              << "x = " << boxmin.x << ", y = " << boxmin.y << ", z = " << boxmin.z << "\n";
+    std::cout << indent << "BoxMax: "
+              << "x = " << boxmax.x << ", y = " << boxmax.y << ", z = " << boxmax.z << "\n";
+
+    std::cout << indent << "DOF Values and Limits:\n";
+    std::cout << indent << "  RotX: Value = " << JointDOF[0]->GetValue()
+              << ", Min = " << JointDOF[0]->GetMinLimit()
+              << ", Max = " << JointDOF[0]->GetMaxLimit() << "\n";
+    std::cout << indent << "  RotY: Value = " << JointDOF[1]->GetValue()
+              << ", Min = " << JointDOF[1]->GetMinLimit()
+              << ", Max = " << JointDOF[1]->GetMaxLimit() << "\n";
+    std::cout << indent << "  RotZ: Value = " << JointDOF[2]->GetValue()
+              << ", Min = " << JointDOF[2]->GetMinLimit()
+              << ", Max = " << JointDOF[2]->GetMaxLimit() << "\n";
+
+    std::cout << indent << "Pose: "
+              << "x = " << pose.x << ", y = " << pose.y << ", z = " << pose.z << "\n";
+    std::cout << indent << "Children: " << children.size() << "\n\n";
+
+    // Recursively print all child joints
+    for (auto* child : children) {
+        child->PrintHierarchy(depth + 1);
+    }
+}

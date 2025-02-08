@@ -110,7 +110,10 @@ int main(int argc, char *argv[]) {
 
        
         Window::displayCallback(window);
+        // std::cout << "check call back" << std::endl;
+
         
+
 
         // Idle callback. Updating objects, etc. can be done here.
         Window::idleCallback();

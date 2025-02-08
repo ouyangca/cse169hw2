@@ -26,6 +26,8 @@ public:
     glm::mat4 GetWorldMatrix(int jointIndex); // Lookup by index
     void BuildJointVector(); // Populate the joint list
     void CollectJoints(Joint* node); // Helper for traversal
+    void PrintDOF();
+    void SetDOF(int jointIndex, int dofIndex, float newValue);
     
 };
 
