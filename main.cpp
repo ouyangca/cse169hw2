@@ -47,8 +47,10 @@ int main(int argc, char *argv[]) {
 
     const char* skelFile = nullptr;
     const char* skinFile = nullptr;
+    const char* animFile = nullptr;
     bool skel_found = false;
     bool skin_found = false;
+    bool anim_found = false;
 
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -58,17 +60,21 @@ int main(int argc, char *argv[]) {
         } else if (arg.find(".skin") != std::string::npos) {
             skinFile = argv[i];
             skin_found = true;
+        } else if (arg.find(".anim") != std::string::npos) {
+            animFile = argv[i];
+            anim_found = true;
         }
     }
 
-    if (skel_found){
-        std::cout << "YAY Skeleton file found. " << std::endl;
+    if (skel_found) {
+        std::cout << "YAY Skeleton file found: " << skelFile << std::endl;
     }
-     if (skin_found){
-        std::cout << "YAY Skin file found. " << std::endl;
-
+    if (skin_found) {
+        std::cout << "YAY Skin file found: " << skinFile << std::endl;
     }
-
+    if (anim_found) {
+        std::cout << "YAY Animation file found: " << animFile << std::endl;
+    }
 
     // Now skelFile and skinFile can be used accordingly
 
@@ -98,9 +104,14 @@ int main(int argc, char *argv[]) {
         
     }
 
+    if (!animFile) {
+        std::cout << "TAT anim FILE NOT FOUND" << std::endl;
+        
+    }
 
 
-    if (!Window::initializeObjects(skel_found, skin_found, skelFile, skinFile )) exit(EXIT_FAILURE);
+
+    if (!Window::initializeObjects(skel_found, skin_found, skelFile, skinFile, animFile )) exit(EXIT_FAILURE);
 
 
 

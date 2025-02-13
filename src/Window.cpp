@@ -14,6 +14,10 @@ bool Window::skel_found;
 bool Window::skin_found;
 int Window::selectedJoint = 0;  // Global or static variable to track the selected joint
 int Window::selectedDOF = 0;
+
+Rig* Window::rig;
+Animation* Window::clip;
+Player* Window::player;
 // Camera Properties
 Camera* Cam;
 
@@ -38,7 +42,7 @@ bool Window::initializeProgram() {
     return true;
 }
 
-bool Window::initializeObjects(bool skel_found, bool skin_found, const char* skelFile, const char* skinFile) {
+bool Window::initializeObjects(bool skel_found, bool skin_found, const char* skelFile, const char* skinFile, const char* animFile) {
     // Create a cube
     // cube = new Cube();
 
@@ -53,27 +57,38 @@ bool Window::initializeObjects(bool skel_found, bool skin_found, const char* ske
     //     // std::cout << "YAY Skin file found. " << std::endl;
     //  }
 
-    if (skel_found && !skin_found){
-        skeleton = new Skeleton();
-        skeleton->load(skelFile);
+    // if (skel_found && !skin_found){
+    //     skeleton = new Skeleton();
+    //     skeleton->load(skelFile);
         
-    }
+    // }
     
-    else if (skel_found && skin_found){
-        // bool binding = true;
-    // std::cout << "seg2" << std::endl;
-        skeleton = new Skeleton();
-        skeleton->load(skelFile);
-        skin = new Skin(true, skeleton);
-        skin->Load(skinFile);
+    // else if (skel_found && skin_found){
+    //     // bool binding = true;
+    // // std::cout << "seg2" << std::endl;
+    //     skeleton = new Skeleton();
+    //     skeleton->load(skelFile);
+    //     skin = new Skin(true, skeleton);
+    //     skin->Load(skinFile);
 
-    }
-    else if (!skel_found && skin_found){
-    // std::cout << "seg 1" << std::endl;
+    // }
+    // else if (!skel_found && skin_found){
+    // // std::cout << "seg 1" << std::endl;
 
-        skin = new Skin(false, skeleton);
-        skin->Load(skinFile);
-    }
+    //     skin = new Skin(false, skeleton);
+    //     skin->Load(skinFile);
+    // }
+
+    skeleton = new Skeleton();
+    skeleton->load(skelFile);
+    skin = new Skin(true, skeleton);
+    skin->Load(skinFile);
+    rig = new Rig();
+    rig->Load("wasp/wasp.skel", "wasp/wasp.skin");
+    clip = new Animation();
+    clip->Load("wasp/wasp_walk.anim");
+    player = new Player(clip, rig);
+    
     
     return true;
 }
@@ -81,6 +96,11 @@ bool Window::initializeObjects(bool skel_found, bool skin_found, const char* ske
 void Window::cleanUp() {
     // Deallcoate the objects.
     delete cube;
+    delete skeleton;
+    delete skin;
+    delete clip;
+    delete player;
+    delete rig;
 
     // Delete the shader program.
     glDeleteProgram(shaderProgram);
@@ -153,20 +173,24 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 void Window::idleCallback() {
     // Perform any updates as necessary.
     Cam->Update();
-    
-    
-    if (skel_found && !skin_found){
-        skeleton->update();
-    }
-    else if (skel_found && skin_found){
-        skeleton->update();
-       skin->Update(true);
-    }
-    else if (!skel_found && skin_found){
-        skeleton->update();
+    skeleton->update();
+    skin->Update(true);
 
-        skin->Update(false);
-    }
+    player->Update();
+    rig->Update(player->rootTranslation);
+
+    // if (skel_found && !skin_found){
+    //     skeleton->update();
+    // }
+    // else if (skel_found && skin_found){
+    //     skeleton->update();
+    //    skin->Update(true);
+    // }
+    // else if (!skel_found && skin_found){
+    //     skeleton->update();
+
+    //     skin->Update(false);
+    // }
     
 }
 
@@ -182,23 +206,27 @@ void Window::displayCallback(GLFWwindow* window) {
     // if (drawSkin){
     //     skin->Draw( false, Cam->GetViewProjectMtx(), Window::shaderProgram);
     // }
-    if (skel_found && !skin_found){
-        skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    }
-    else if (skel_found && skin_found){
-    // std::cout << "draw" << std::endl;
-        //skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    // if (skel_found && !skin_found){
+    //     skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    // }
+    // else if (skel_found && skin_found){
+    // // std::cout << "draw" << std::endl;
+    //     //skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
         
-       skin->DrawTriangle(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    }
-    else if (!skel_found && skin_found){
-        // std::cout << "skin is found" << std::endl;
-    // std::cout << "triangle 1" << std::endl;
+    //    skin->DrawTriangle(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    // }
+    // else if (!skel_found && skin_found){
+    //     // std::cout << "skin is found" << std::endl;
+    // // std::cout << "triangle 1" << std::endl;
 
-        skin->DrawTriangle(Cam->GetViewProjectMtx(), Window::shaderProgram);
-        // std::cout << "draw is done" << std::endl;
+    //     skin->DrawTriangle(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    //     // std::cout << "draw is done" << std::endl;
 
-    }
+    // }
+    
+
+    // animation
+    player->rig->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
     
 
     // Gets events, including input such as keyboard and mouse or window resizing.

@@ -19,6 +19,7 @@ public:
     bool load(const char* skelFile);
     // ○ Building skeleton tree structure (bones + joints)
     void update();
+    void Update(glm::mat4 parentW);
     // ○ Computing local/world matrices through update()
     // ○ Rendering everything through draw()
 

@@ -6,6 +6,9 @@
 #include "core.h"
 #include "Skeleton.h"
 #include "Skin.h"
+#include "Animation.h"
+#include "Player.h"
+#include "Rig.h"
 
 class Window {
 public:
@@ -20,6 +23,9 @@ public:
 
     static Skeleton* skeleton;
     static Skin* skin;
+    static Rig* rig;
+    static Animation* clip;
+    static Player* player;
 
     // Objects to render
     static Cube* cube;
@@ -29,7 +35,8 @@ public:
 
     // Act as Constructors and desctructors
     static bool initializeProgram();
-    static bool initializeObjects(bool skel_found, bool skin_found, const char* skelFile, const char* skinFile);
+    static bool initializeObjects(bool skel_found, bool skin_found, 
+                const char* skelFile, const char* skinFile, const char* animFile);
     static void cleanUp();
     static void printDOF();
 

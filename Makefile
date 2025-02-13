@@ -8,8 +8,8 @@ LDFLAGS = -framework OpenGL -L$(BREW)/lib -lglfw
 
 RM = /bin/rm -f
 all: menv
-menv: main.o Camera.o Cube.o Shader.o Tokenizer.o Window.o Skeleton.o Joint.o DOF.o Skin.o Vertex.o Triangle.o
-	$(CC) -o menv main.o Camera.o Cube.o Shader.o Tokenizer.o Skeleton.o Joint.o DOF.o Window.o Skin.o Vertex.o Triangle.o $(LDFLAGS)
+menv: main.o Camera.o Cube.o Shader.o Tokenizer.o Window.o Skeleton.o Joint.o DOF.o Skin.o Vertex.o Triangle.o Keyframe.o Channel.o Animation.o Player.o Rig.o 
+	$(CC) -o menv main.o Camera.o Cube.o Shader.o Tokenizer.o Skeleton.o Joint.o DOF.o Window.o Skin.o Vertex.o Triangle.o Keyframe.o Channel.o Animation.o Player.o Rig.o $(LDFLAGS)
 main.o: main.cpp include/Window.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
 Camera.o: src/Camera.cpp include/Camera.h
@@ -34,6 +34,18 @@ Vertex.o: src/Vertex.cpp include/Vertex.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Vertex.cpp
 Skin.o: src/Skin.cpp include/Skin.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Skin.cpp
+Keyframe.o: src/Keyframe.cpp include/Keyframe.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Keyframe.cpp
+Channel.o: src/Channel.cpp include/Channel.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Channel.cpp
+Animation.o: src/Animation.cpp include/Animation.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Animation.cpp
+Player.o: src/Player.cpp include/Player.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Player.cpp
+Rig.o: src/Rig.cpp include/Rig.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Rig.cpp
+
+
 
 
 clean: 

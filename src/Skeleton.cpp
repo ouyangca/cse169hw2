@@ -38,6 +38,11 @@ void Skeleton::update()
 	root->Update(temp);
 }
 
+void Skeleton::Update(glm::mat4 parentW)
+{
+	root->Update(parentW);
+}
+
 // ○ Rendering everything through draw()
 
 void Skeleton::draw(const glm::mat4& viewProjMtx, GLuint shader)
