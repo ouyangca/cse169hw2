@@ -4,12 +4,12 @@ BREW = $(shell brew --prefix)
 
 CFLAGS = -g -std=c++11 -Wno-deprecated-declarations -DGLM_ENABLE_EXPERIMENTAL
 INCFLAGS = -Iinclude -I$(BREW)/include
-LDFLAGS = -framework OpenGL -L$(BREW)/lib -lglfw
+LDFLAGS = -framework OpenGL -L$(BREW)/lib -lglfw -lGLEW
 
 RM = /bin/rm -f
 all: menv
-menv: main.o Camera.o Cube.o Shader.o Tokenizer.o Window.o Skeleton.o Joint.o DOF.o Skin.o Vertex.o Triangle.o Keyframe.o Channel.o Animation.o Player.o Rig.o 
-	$(CC) -o menv main.o Camera.o Cube.o Shader.o Tokenizer.o Skeleton.o Joint.o DOF.o Window.o Skin.o Vertex.o Triangle.o Keyframe.o Channel.o Animation.o Player.o Rig.o $(LDFLAGS)
+menv: main.o Camera.o Cube.o Shader.o Tokenizer.o Window.o Skeleton.o Joint.o DOF.o Skin.o Vertex.o Triangle.o Keyframe.o Channel.o Animation.o Player.o Rig.o Cloth.o Particle.o SpringDamper.o Tri.o
+	$(CC) -o menv main.o Camera.o Cube.o Shader.o Tokenizer.o Skeleton.o Joint.o DOF.o Window.o Skin.o Vertex.o Triangle.o Keyframe.o Channel.o Animation.o Player.o Rig.o Cloth.o Particle.o SpringDamper.o Tri.o $(LDFLAGS)
 main.o: main.cpp include/Window.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
 Camera.o: src/Camera.cpp include/Camera.h
@@ -44,6 +44,15 @@ Player.o: src/Player.cpp include/Player.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Player.cpp
 Rig.o: src/Rig.cpp include/Rig.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Rig.cpp
+Cloth.o: src/Cloth.cpp include/Cloth.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Cloth.cpp
+Particle.o: src/Particle.cpp include/Particle.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Particle.cpp
+SpringDamper.o: src/SpringDamper.cpp include/SpringDamper.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/SpringDamper.cpp
+Tri.o: src/Tri.cpp include/Tri.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Tri.cpp
+
 
 
 

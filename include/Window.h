@@ -9,6 +9,8 @@
 #include "Animation.h"
 #include "Player.h"
 #include "Rig.h"
+#include "Cloth.h"
+
 
 class Window {
 public:
@@ -20,12 +22,14 @@ public:
     static bool skin_found;
     static int selectedJoint;  // Global or static variable to track the selected joint
     static int selectedDOF;
+    static int selectedFixedPoint;
 
     static Skeleton* skeleton;
     static Skin* skin;
     static Rig* rig;
     static Animation* clip;
     static Player* player;
+    static Cloth* cloth;
 
     // Objects to render
     static Cube* cube;
@@ -35,8 +39,7 @@ public:
 
     // Act as Constructors and desctructors
     static bool initializeProgram();
-    static bool initializeObjects(bool skel_found, bool skin_found, 
-                const char* skelFile, const char* skinFile, const char* animFile);
+    static bool initializeObjects();
     static void cleanUp();
     static void printDOF();
 

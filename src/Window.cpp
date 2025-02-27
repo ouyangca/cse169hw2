@@ -14,10 +14,13 @@ bool Window::skel_found;
 bool Window::skin_found;
 int Window::selectedJoint = 0;  // Global or static variable to track the selected joint
 int Window::selectedDOF = 0;
+int Window::selectedFixedPoint = 0;
 
 Rig* Window::rig;
 Animation* Window::clip;
 Player* Window::player;
+
+Cloth* Window::cloth;
 // Camera Properties
 Camera* Cam;
 
@@ -42,65 +45,20 @@ bool Window::initializeProgram() {
     return true;
 }
 
-bool Window::initializeObjects(bool skel_found, bool skin_found, const char* skelFile, const char* skinFile, const char* animFile) {
+bool Window::initializeObjects() {
     // Create a cube
-    // cube = new Cube();
+        // Cloth::Cloth(int w, int h, float mass, float stiffness, float damping, float wind)
+    cloth = new Cloth(50, 50, 1.0f, 500.0f, 0.1f, 0.2f);
+    std::cout << "initializeObjects completed" << std::endl;
 
-    skeleton = nullptr;
 
-    Window::skel_found = skel_found;
-    Window::skin_found = skin_found;
-    // if (skel_found){
-    //     // std::cout << "YAY Skeleton file found. " << std::endl;
-    // }
-    //  if (skin_found){
-    //     // std::cout << "YAY Skin file found. " << std::endl;
-    //  }
-
-    // if (skel_found && !skin_found){
-    //     skeleton = new Skeleton();
-    //     skeleton->load(skelFile);
-        
-    // }
-    
-    // else if (skel_found && skin_found){
-    //     // bool binding = true;
-    // // std::cout << "seg2" << std::endl;
-    //     skeleton = new Skeleton();
-    //     skeleton->load(skelFile);
-    //     skin = new Skin(true, skeleton);
-    //     skin->Load(skinFile);
-
-    // }
-    // else if (!skel_found && skin_found){
-    // // std::cout << "seg 1" << std::endl;
-
-    //     skin = new Skin(false, skeleton);
-    //     skin->Load(skinFile);
-    // }
-
-    skeleton = new Skeleton();
-    skeleton->load(skelFile);
-    skin = new Skin(true, skeleton);
-    skin->Load(skinFile);
-    rig = new Rig();
-    rig->Load("wasp/wasp.skel", "wasp/wasp.skin");
-    clip = new Animation();
-    clip->Load("wasp/wasp_walk.anim");
-    player = new Player(clip, rig);
-    
     
     return true;
 }
 
 void Window::cleanUp() {
     // Deallcoate the objects.
-    delete cube;
-    delete skeleton;
-    delete skin;
-    delete clip;
-    delete player;
-    delete rig;
+    delete cloth;
 
     // Delete the shader program.
     glDeleteProgram(shaderProgram);
@@ -171,64 +129,19 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 
 // update and draw functions
 void Window::idleCallback() {
-    // Perform any updates as necessary.
-    Cam->Update();
-    skeleton->update();
-    skin->Update(true);
+    std::cout << "idle callback" << std::endl;
+    cloth->ApplyForces(glm::vec3(0.0f, -9.81f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0);
+    cloth->Update(0.01f);
 
-    player->Update();
-    rig->Update(player->rootTranslation);
-
-    // if (skel_found && !skin_found){
-    //     skeleton->update();
-    // }
-    // else if (skel_found && skin_found){
-    //     skeleton->update();
-    //    skin->Update(true);
-    // }
-    // else if (!skel_found && skin_found){
-    //     skeleton->update();
-
-    //     skin->Update(false);
-    // }
     
 }
 
 void Window::displayCallback(GLFWwindow* window) {
     // Clear the color and depth buffers.
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Render the object.
-    // cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    // if (drawSkeleton){
-    //     skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    // }
-    // if (drawSkin){
-    //     skin->Draw( false, Cam->GetViewProjectMtx(), Window::shaderProgram);
-    // }
-    // if (skel_found && !skin_found){
-    //     skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    // }
-    // else if (skel_found && skin_found){
-    // // std::cout << "draw" << std::endl;
-    //     //skeleton->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-        
-    //    skin->DrawTriangle(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    // }
-    // else if (!skel_found && skin_found){
-    //     // std::cout << "skin is found" << std::endl;
-    // // std::cout << "triangle 1" << std::endl;
-
-    //     skin->DrawTriangle(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    //     // std::cout << "draw is done" << std::endl;
-
-    // }
-    
-
-    // animation
-    player->rig->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    
-
+    cloth->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
     // Gets events, including input such as keyboard and mouse or window resizing.
     glfwPollEvents();
     // Swap buffers.
@@ -245,69 +158,24 @@ void Window::printDOF(){
     skeleton->PrintDOF();
 }
 
-// callbacks - for Interaction
-void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    /*
-     * TODO: Modify below to add your key callbacks.
-     */
 
-    // Check for a key press.
+void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (action == GLFW_PRESS) {
         switch (key) {
-            case GLFW_KEY_ESCAPE:
-                // Close the window. This causes the program to also terminate.
-                glfwSetWindowShouldClose(window, GL_TRUE);
+            case GLFW_KEY_LEFT:
+                cloth->MoveFixedPoint(selectedFixedPoint, glm::vec3(-0.1f, 0, 0));
                 break;
-
-            case GLFW_KEY_R:
-                resetCamera();
+            case GLFW_KEY_RIGHT:
+                cloth->MoveFixedPoint(selectedFixedPoint, glm::vec3(0.1f, 0, 0));
                 break;
-
-            case GLFW_KEY_D:
-                printDOF();
+            case GLFW_KEY_UP:
+                cloth->MoveFixedPoint(selectedFixedPoint, glm::vec3(0, 0.1f, 0));
                 break;
-
-
-
-             case GLFW_KEY_E:
-                std::cout << "Edit DOF Mode: Use J/K to select joints, U/I to select DOFs, and +/- to modify values." << std::endl;
+            case GLFW_KEY_DOWN:
+                cloth->MoveFixedPoint(selectedFixedPoint, glm::vec3(0, -0.1f, 0));
                 break;
-
-            case GLFW_KEY_J:  // Move to previous joint
-                selectedJoint = std::max(0, selectedJoint - 1);
-                std::cout << "Selected Joint: " << selectedJoint << std::endl;
-                break;
-
-            case GLFW_KEY_K:  // Move to next joint
-                selectedJoint = std::min((int)skeleton->joints.size() - 1, selectedJoint + 1);
-                std::cout << "Selected Joint: " << selectedJoint << std::endl;
-                break;
-
-            case GLFW_KEY_U:  // Move to previous DOF
-                selectedDOF = std::max(0, selectedDOF - 1);
-                std::cout << "Selected DOF: " << selectedDOF << std::endl;
-                break;
-
-            case GLFW_KEY_I:  // Move to next DOF
-                selectedDOF = std::min((int)skeleton->joints[selectedJoint]->JointDOF.size() - 1, selectedDOF + 1);
-                std::cout << "Selected DOF: " << selectedDOF << std::endl;
-                break;
-
-            case GLFW_KEY_EQUAL:  // Increase DOF value ('+' key)
-                if (!skeleton->joints[selectedJoint]->JointDOF.empty()) {
-                    float newValue = skeleton->joints[selectedJoint]->JointDOF[selectedDOF]->GetValue() + 0.1f;
-                    skeleton->SetDOF(selectedJoint, selectedDOF, newValue);
-                }
-                break;
-
-            case GLFW_KEY_MINUS:  // Decrease DOF value ('-' key)
-                if (!skeleton->joints[selectedJoint]->JointDOF.empty()) {
-                    float newValue = skeleton->joints[selectedJoint]->JointDOF[selectedDOF]->GetValue() - 0.1f;
-                    skeleton->SetDOF(selectedJoint, selectedDOF, newValue);
-                }
-                break;
-
-            default:
+            case GLFW_KEY_TAB:
+                selectedFixedPoint = (selectedFixedPoint + 1) % cloth->GetNumFixedPoints();
                 break;
         }
     }

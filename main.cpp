@@ -45,36 +45,7 @@ void print_versions() {
 
 int main(int argc, char *argv[]) {
 
-    const char* skelFile = nullptr;
-    const char* skinFile = nullptr;
-    const char* animFile = nullptr;
-    bool skel_found = false;
-    bool skin_found = false;
-    bool anim_found = false;
-
-    for (int i = 1; i < argc; i++) {
-        std::string arg = argv[i];
-        if (arg.find(".skel") != std::string::npos) {
-            skelFile = argv[i];
-            skel_found = true;
-        } else if (arg.find(".skin") != std::string::npos) {
-            skinFile = argv[i];
-            skin_found = true;
-        } else if (arg.find(".anim") != std::string::npos) {
-            animFile = argv[i];
-            anim_found = true;
-        }
-    }
-
-    if (skel_found) {
-        std::cout << "YAY Skeleton file found: " << skelFile << std::endl;
-    }
-    if (skin_found) {
-        std::cout << "YAY Skin file found: " << skinFile << std::endl;
-    }
-    if (anim_found) {
-        std::cout << "YAY Animation file found: " << animFile << std::endl;
-    }
+    
 
     // Now skelFile and skinFile can be used accordingly
 
@@ -92,39 +63,14 @@ int main(int argc, char *argv[]) {
     // Initialize the shader program; exit if initialization fails.
     if (!Window::initializeProgram()) exit(EXIT_FAILURE);
     // Initialize objects/pointers for rendering; exit if initialization fails.
-    
-
-     if (!skelFile) {
-            std::cout << "TAT SKELETON FILE NOT FOUND" << std::endl;
-    }
-
-
-    if (!skinFile) {
-        std::cout << "TAT SKIN FILE NOT FOUND" << std::endl;
-        
-    }
-
-    if (!animFile) {
-        std::cout << "TAT anim FILE NOT FOUND" << std::endl;
-        
-    }
-
-
-
-    if (!Window::initializeObjects(skel_found, skin_found, skelFile, skinFile, animFile )) exit(EXIT_FAILURE);
-
-
+    if (!Window::initializeObjects()) exit(EXIT_FAILURE);
 
     // Loop while GLFW window should stay open.
     while (!glfwWindowShouldClose(window)) {
         // Main render display callback. Rendering of objects is done here.
-
        
         Window::displayCallback(window);
         // std::cout << "check call back" << std::endl;
-
-        
-
 
         // Idle callback. Updating objects, etc. can be done here.
         Window::idleCallback();
