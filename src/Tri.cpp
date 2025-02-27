@@ -1,7 +1,7 @@
 #include "Tri.h"
 
-Tri::Tri(Particle* a, Particle* b, Particle* c)
-    : p1(a), p2(b), p3(c) {}
+Tri::Tri(Particle* p1, Particle* p2, Particle* p3, int p1_index, int p2_index, int p3_index)
+        : p1(p1), p2(p2), p3(p3), p1_index(p1_index), p2_index(p2_index), p3_index(p3_index) {}
 
 glm::vec3 Tri::ComputeNormal() const {
     glm::vec3 v1 = p2->position - p1->position;

@@ -130,7 +130,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 // update and draw functions
 void Window::idleCallback() {
     std::cout << "idle callback" << std::endl;
-    cloth->ApplyForces(glm::vec3(0.0f, -9.81f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0);
+    // cloth->ApplyForces(glm::vec3(0.0f, -9.81f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0);
     cloth->Update(0.01f);
 
     

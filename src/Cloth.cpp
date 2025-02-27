@@ -1,4 +1,5 @@
 #include "Cloth.h"
+#include <glm/gtc/type_ptr.hpp> // For glm::value_ptr
 #include <iostream>
 
 
@@ -57,8 +58,8 @@ void Cloth::Initialize() {
             s_indices.push_back(i2);
             s_indices.push_back(i4);
 
-            triangles.emplace_back(&particles[i1], &particles[i2], &particles[i3]);
-            triangles.emplace_back(&particles[i3], &particles[i2], &particles[i4]);
+            triangles.emplace_back(&particles[i1], &particles[i2], &particles[i3], i1, i2, i3);
+            triangles.emplace_back(&particles[i3], &particles[i2], &particles[i4], i3, i2, i4);
         }
     }
 
@@ -115,6 +116,7 @@ void Cloth::Update(float deltaTime) {
     UpdateMesh();
 }
 
+
 void Cloth::UpdateMesh() {
     s_positions.clear();
     s_normals.clear();
@@ -129,9 +131,11 @@ void Cloth::UpdateMesh() {
 
     for (const auto& tri : triangles) {
         glm::vec3 normal = tri.ComputeNormal();
-        temp_normals[GetIndex(tri.p1->position.x, tri.p1->position.y)] += normal;
-        temp_normals[GetIndex(tri.p2->position.x, tri.p2->position.y)] += normal;
-        temp_normals[GetIndex(tri.p3->position.x, tri.p3->position.y)] += normal;
+
+        // Use precomputed indices for the particles
+        temp_normals[tri.p1_index] += normal;
+        temp_normals[tri.p2_index] += normal;
+        temp_normals[tri.p3_index] += normal;
     }
 
     for (auto& n : temp_normals) {
@@ -139,8 +143,73 @@ void Cloth::UpdateMesh() {
     }
 }
 
+
+// void Cloth::Draw(const glm::mat4& viewProjMtx, GLuint shaderProgram) {
+//     // Ensure there is data to render
+//     if (s_positions.empty() || s_normals.empty() || s_indices.empty()) {
+//         std::cerr << "Error: No mesh data to render." << std::endl;
+//         return;
+//     }
+
+//     // Bind the shader program
+//     glUseProgram(shaderProgram);
+
+//     // Create and bind a VAO (Vertex Array Object)
+//     GLuint vao;
+//     glGenVertexArrays(1, &vao);
+//     glBindVertexArray(vao);
+
+//     // Create and bind a VBO (Vertex Buffer Object) for positions
+//     GLuint vbo_positions;
+//     glGenBuffers(1, &vbo_positions);
+//     glBindBuffer(GL_ARRAY_BUFFER, vbo_positions);
+//     glBufferData(GL_ARRAY_BUFFER, s_positions.size() * sizeof(glm::vec3), s_positions.data(), GL_STATIC_DRAW);
+
+//     // Set up the vertex attribute pointer for positions
+//     GLint posAttrib = glGetAttribLocation(shaderProgram, "aPosition");
+//     glEnableVertexAttribArray(posAttrib);
+//     glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+//     // Create and bind a VBO for normals
+//     GLuint vbo_normals;
+//     glGenBuffers(1, &vbo_normals);
+//     glBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
+//     glBufferData(GL_ARRAY_BUFFER, s_normals.size() * sizeof(glm::vec3), s_normals.data(), GL_STATIC_DRAW);
+
+//     // Set up the vertex attribute pointer for normals
+//     GLint normalAttrib = glGetAttribLocation(shaderProgram, "aNormal");
+//     glEnableVertexAttribArray(normalAttrib);
+//     glVertexAttribPointer(normalAttrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+//     // Create and bind an EBO (Element Buffer Object) for indices
+//     GLuint ebo;
+//     glGenBuffers(1, &ebo);
+//     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+//     glBufferData(GL_ELEMENT_ARRAY_BUFFER, s_indices.size() * sizeof(unsigned int), s_indices.data(), GL_STATIC_DRAW);
+
+//     // Set up the transformation matrix
+//     glm::mat4 model = glm::mat4(1.0f); // Identity matrix (no transformation)
+//     glm::mat4 mvp = viewProjMtx * model;
+
+//     // Pass the MVP matrix to the shader
+//     GLint mvpLoc = glGetUniformLocation(shaderProgram, "uMVP");
+//     glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+
+//     // Draw the cloth using the element buffer
+//     glDrawElements(GL_TRIANGLES, s_indices.size(), GL_UNSIGNED_INT, 0);
+
+//     // Clean up
+//     glDeleteBuffers(1, &vbo_positions);
+//     glDeleteBuffers(1, &vbo_normals);
+//     glDeleteBuffers(1, &ebo);
+//     glDeleteVertexArrays(1, &vao);
+
+//     // Unbind the shader program
+//     glUseProgram(0);
+// }
+
 // OpenGL Rendering
-void Cloth::Draw(const glm::mat4& viewProjMtx, GLuint shaderProgram) {
+// void Cloth::Draw(const glm::mat4& viewProjMtx, GLuint shaderProgram) {
     // Update render data
     // std::vector<glm::vec3> positions;
     // std::vector<glm::vec3> normals;
@@ -185,9 +254,11 @@ void Cloth::Draw(const glm::mat4& viewProjMtx, GLuint shaderProgram) {
     // renderTriangles = nullptr;
 
     
-    std::cout << "draw" << std::endl;
 
-}
+    
+//     std::cout << "draw" << std::endl;
+
+// }
 
 int Cloth::GetIndex(int x, int y) const {
     return y * width + x;
