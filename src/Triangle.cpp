@@ -9,22 +9,6 @@ Triangle::Triangle(bool skel_found, std::vector<glm::vec3> s_positions,
     // The color of the cube. Try setting it to something else!
     color = glm::vec3(1.0f, 0.95f, 0.1f);
 
-
-
-    // // Specify vertex positions & normals
-    // for (int i=0; i < vertices.size(); i++) {
-    //     if (skel_found){
-    //         positions.push_back(vertices[i]->shader_position);
-            
-    //         normals.push_back(vertices[i]->shader_normal);
-    //     }
-    //     else{
-    //         positions.push_back(vertices[i]->position);
-    //         normals.push_back(vertices[i]->normal);
-
-    //     }
-    // }
-
     positions = s_positions;
     normals = s_normals;
     indices = s_indices;
@@ -60,6 +44,8 @@ Triangle::Triangle(bool skel_found, std::vector<glm::vec3> s_positions,
     // Unbind the VBOs.
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
+    std::cout << "triangle init success" << std::endl;
 }
 
 Triangle::~Triangle() {
@@ -78,16 +64,22 @@ void Triangle::draw(const glm::mat4& viewProjMtx, GLuint shader) {
     glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, false, (float*)&viewProjMtx);
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&model);
     glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &color[0]);
+    std::cout << "triangle location sent to shader" << std::endl;
+
 
     // Bind the VAO
     glBindVertexArray(VAO);
 
     // draw the points using triangles, indexed with the EBO
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    std::cout << "triangle gl element draw" << std::endl;
+
 
     // Unbind the VAO and shader program
     glBindVertexArray(0);
     glUseProgram(0);
+    std::cout << "triangle draw success" << std::endl;
+
 }
 
 
