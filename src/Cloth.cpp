@@ -21,7 +21,8 @@ void Cloth::Initialize() {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             glm::vec3 position = glm::vec3(x * 0.1f, height * 0.1f - y * 0.1f, 0.0f);
-            bool fixed = (y == 0);  // Fix the top row
+            bool fixed = (y == 0);
+
             particles.emplace_back(position, 1.0f, fixed);
         }
     }
@@ -30,16 +31,15 @@ void Cloth::Initialize() {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             if (x < width - 1) // Horizontal
-                springs.emplace_back(&particles[GetIndex(x, y)], &particles[GetIndex(x + 1, y)], 500.0f, 0.1f);
+                springs.emplace_back(&particles[GetIndex(x, y)], &particles[GetIndex(x + 1, y)], 2500.0f, 24.0f);
             if (y < height - 1) // Vertical
-                springs.emplace_back(&particles[GetIndex(x, y)], &particles[GetIndex(x, y + 1)], 500.0f, 0.1f);
+                springs.emplace_back(&particles[GetIndex(x, y)], &particles[GetIndex(x, y + 1)], 2500.0f, 24.0f);
             if (x < width - 1 && y < height - 1) { // Diagonal (shear)
-                springs.emplace_back(&particles[GetIndex(x, y)], &particles[GetIndex(x + 1, y + 1)], 500.0f, 0.1f);
-                springs.emplace_back(&particles[GetIndex(x + 1, y)], &particles[GetIndex(x, y + 1)], 500.0f, 0.1f);
+                springs.emplace_back(&particles[GetIndex(x, y)], &particles[GetIndex(x + 1, y + 1)], 5.0f, 0.5f);
+                springs.emplace_back(&particles[GetIndex(x + 1, y)], &particles[GetIndex(x, y + 1)], 5.0f, 0.5f);
             }
         }
     }
-    // std::cout << "Init." << std::endl;
 
 
     // Create triangle mesh for rendering & physics
@@ -49,6 +49,10 @@ void Cloth::Initialize() {
             unsigned int i2 = GetIndex(x + 1, y);
             unsigned int i3 = GetIndex(x, y + 1);
             unsigned int i4 = GetIndex(x + 1, y + 1);
+
+            if (i1 >= particles.size() || i2 >= particles.size() || i3 >= particles.size() || i4 >= particles.size()) {
+            std::cout << "Error: Invalid triangle index detected." << std::endl;
+        }
 
             s_indices.push_back(i1);
             s_indices.push_back(i2);
@@ -68,16 +72,6 @@ void Cloth::Initialize() {
 }
 
 void Cloth::ApplyForces(const glm::vec3& gravity, const glm::vec3& windDirection, float windSpeed) {
-    for (auto& p : particles) {
-        if (!p.isFixed) {
-            // Apply gravity
-            p.ApplyForce(gravity * p.mass);
-
-            // Apply wind force
-            glm::vec3 windForce = windDirection * windSpeed;
-            p.ApplyForce(windForce);
-        }
-    }
 
     // Apply aerodynamic forces using Tri
     for (auto& t : triangles) {
@@ -100,7 +94,7 @@ void Cloth::SetupMesh() {
 
     for (const auto& tri : triangles) {
         glm::vec3 normal = tri.ComputeNormal();
-
+        std::cout << "Triangle normal: (" << normal.x << ", " << normal.y << ", " << normal.z << ")" << std::endl;
         // Use precomputed indices for the particles
         temp_normals[tri.p1_index] += normal;
         temp_normals[tri.p2_index] += normal;
@@ -108,8 +102,12 @@ void Cloth::SetupMesh() {
     }
 
     for (auto& n : temp_normals) {
+    if (glm::length(n) > 1e-6f) {
         s_normals.push_back(glm::normalize(n));
+    } else {
+        s_normals.push_back(glm::vec3(0.0f, 1.0f, 0.0f)); // Default normal
     }
+}
 
 
 
@@ -136,16 +134,36 @@ void Cloth::SetupMesh() {
 }
 
 void Cloth::Update(float deltaTime) {
-    return;
-        std::cout << "updating" << std::endl;
+
+    
+
+    for (auto& p : particles) {
+        p.force = glm::vec3(0);
+
+    }
 
     for (auto& spring : springs) {
         spring.ComputeForce();
     }
 
+
+    glm::vec3 force(0.0f, -0.0f, 0.0f);  // Gravity pulls downward
+    glm::vec3 windDirection(1.0f, 1.0f, 0.0f); // Wind blowing in the +X direction
+    float windSpeed = 0.000001f; // Adjustable wind speed
+
+    // Call ApplyForces to apply physics
+    ApplyForces(force, windDirection, windSpeed);
+
     for (auto& p : particles) {
         p.Update(deltaTime);
     }
+
+    for (auto& p : particles) {
+        std::cout << "Particle force: (" << p.force.x << ", " << p.force.y << ", " << p.force.z << ")" << std::endl;
+        std::cout << "Particle position: (" << p.position.x << ", " << p.position.y << ", " << p.position.z << ")" << std::endl;
+    }
+
+
 
     UpdateMesh();
 }
@@ -164,16 +182,23 @@ void Cloth::UpdateMesh() {
 
     for (const auto& tri : triangles) {
         glm::vec3 normal = tri.ComputeNormal();
+        // std::cout << normal[]
 
         // Use precomputed indices for the particles
         temp_normals[tri.p1_index] += normal;
         temp_normals[tri.p2_index] += normal;
         temp_normals[tri.p3_index] += normal;
+
+        
+    }
+    for (auto& n : temp_normals) {
+        if (glm::length(n) > 1e-6f) {
+            s_normals.push_back(glm::normalize(n));
+        } else {
+            s_normals.push_back(glm::vec3(0.0f, 1.0f, 0.0f)); // Default normal
+        }
     }
 
-    for (auto& n : temp_normals) {
-        s_normals.push_back(glm::normalize(n));
-    }
 }
 
 // void Cloth::Draw(const glm::mat4& viewProjMtx, GLuint shaderProgram) {
@@ -241,20 +266,16 @@ void Cloth::Draw(const glm::mat4& viewProjMtx, GLuint shaderProgram) {
     glDrawElements(GL_TRIANGLES, s_indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     glUseProgram(0);
-
-    std::cout << "Positions size: " << s_positions.size() << std::endl;
-    std::cout << "Normals size: " << s_normals.size() << std::endl;
-    std::cout << "Indices size: " << s_indices.size() << std::endl;
-    std::cout << "Positions: " << s_positions[0][0] << " " << s_positions[0][1] << " " << s_positions[0][2]<< std::endl;
-    std::cout << "Normal: " << s_normals[0][0] << " " << s_normals[0][1] << " " << s_normals[0][2]<< std::endl;
-
-    std::cout << "Indices: " << s_indices[0] << " " << s_indices[1] << " " << s_indices[2]<< std::endl;
-
     
 
+    // std::cout << "Positions size: " << s_positions.size() << std::endl;
+    // std::cout << "Normals size: " << s_normals.size() << std::endl;
+    // std::cout << "Indices size: " << s_indices.size() << std::endl;
+    // std::cout << "Positions: " << s_positions[200][0] << " " << s_positions[200][1] << " " << s_positions[200][2]<< std::endl;
+    // std::cout << "Normal: " << s_normals[200][0] << " " << s_normals[200][1] << " " << s_normals[200][2]<< std::endl;
 
-    // renderTriangles = new Triangle(true, s_positions, s_normals, s_indices);   
-    // renderTriangles->draw(viewProjMtx, shaderProgram);
+    // std::cout << "Indices: " << s_indices[0] << " " << s_indices[1] << " " << s_indices[2]<< std::endl;
+
 
 }
 
@@ -264,8 +285,8 @@ int Cloth::GetIndex(int x, int y) const {
 
 
 void Cloth::MoveFixedPoint(int index, glm::vec3 delta) {
-    if (index >= 0 && index < particles.size() && particles[index].isFixed) {
-        particles[index].position += delta;
+    for (auto& p : particles) {
+        if(p.isFixed) p.position += delta;
     }
 }
 

@@ -8,8 +8,8 @@ LDFLAGS = -framework OpenGL -L$(BREW)/lib -lglfw -lGLEW
 
 RM = /bin/rm -f
 all: menv
-menv: main.o Camera.o Cube.o Shader.o Tokenizer.o Window.o Skeleton.o Joint.o DOF.o Skin.o Vertex.o Triangle.o Keyframe.o Channel.o Animation.o Player.o Rig.o Cloth.o Particle.o SpringDamper.o Tri.o
-	$(CC) -o menv main.o Camera.o Cube.o Shader.o Tokenizer.o Skeleton.o Joint.o DOF.o Window.o Skin.o Vertex.o Triangle.o Keyframe.o Channel.o Animation.o Player.o Rig.o Cloth.o Particle.o SpringDamper.o Tri.o $(LDFLAGS)
+menv: main.o Camera.o Cube.o Shader.o Tokenizer.o Window.o Skeleton.o Joint.o DOF.o Skin.o Vertex.o Triangle.o Keyframe.o Channel.o Animation.o Player.o Rig.o Cloth.o Particle.o SpringDamper.o Tri.o Ground.o
+	$(CC) -o menv main.o Camera.o Cube.o Shader.o Tokenizer.o Skeleton.o Joint.o DOF.o Window.o Skin.o Vertex.o Triangle.o Keyframe.o Channel.o Animation.o Player.o Rig.o Cloth.o Particle.o SpringDamper.o Tri.o Ground.o $(LDFLAGS)
 main.o: main.cpp include/Window.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
 Camera.o: src/Camera.cpp include/Camera.h
@@ -52,6 +52,8 @@ SpringDamper.o: src/SpringDamper.cpp include/SpringDamper.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c src/SpringDamper.cpp
 Tri.o: src/Tri.cpp include/Tri.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Tri.cpp
+Ground.o: src/Ground.cpp include/Ground.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Ground.cpp
 
 
 

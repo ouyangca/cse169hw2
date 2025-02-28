@@ -8,19 +8,11 @@ const char* Window::windowTitle = "Model Environment";
 
 // Objects to render
 Cube* Window::cube;
-Skeleton* Window::skeleton;
-Skin* Window::skin;
-bool Window::skel_found;
-bool Window::skin_found;
-int Window::selectedJoint = 0;  // Global or static variable to track the selected joint
-int Window::selectedDOF = 0;
-int Window::selectedFixedPoint = 0;
-
-Rig* Window::rig;
-Animation* Window::clip;
-Player* Window::player;
-
 Cloth* Window::cloth;
+int Window::selectedFixedPoint = 0;
+Ground* Window::ground;
+
+
 // Camera Properties
 Camera* Cam;
 
@@ -47,19 +39,20 @@ bool Window::initializeProgram() {
 
 bool Window::initializeObjects() {
     // Create a cube
-    cube = new Cube();
-        // Cloth::Cloth(int w, int h, float mass, float stiffness, float damping, float wind)
-    cloth = new Cloth(50, 50, 1.0f, 500.0f, 0.1f, 0.2f);
+    // cube = new Cube();
+    cloth = new Cloth(20, 20, 0.1f, 500.0f, 1.0f, 0.2f);
+    ground = new Ground(100.0f);
 
+    // cube = new Cube(glm::vec3(-1, 0, -2), glm::vec3(1, 1, 1));
 
-    
     return true;
 }
 
 void Window::cleanUp() {
     // Deallcoate the objects.
+    // delete cube;
     delete cloth;
-    delete cube;
+    delete ground;
 
     // Delete the shader program.
     glDeleteProgram(shaderProgram);
@@ -128,23 +121,32 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
     Cam->SetAspect(float(width) / float(height));
 }
 
-// update and draw functions
 void Window::idleCallback() {
-    // std::cout << "idle callback" << std::endl;
-    // cloth->ApplyForces(glm::vec3(0.0f, -9.81f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0);
-    // cloth->Update(0.01f);
-    cube->update();
+    Cam->Update();
 
-    
+    float totalDeltaTime = 0.005f; 
+
+    // Use oversampling: perform multiple small steps
+    int substeps = 10; 
+    float subDeltaTime = totalDeltaTime / substeps; 
+
+    for (int i = 0; i < substeps; i++) {
+        cloth->Update(subDeltaTime);
+    }
 }
+
 
 void Window::displayCallback(GLFWwindow* window) {
     // Clear the color and depth buffers.
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // cloth->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    // Render the object.
+    // cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    cloth->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    ground->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+
+    
+
 
     // Gets events, including input such as keyboard and mouse or window resizing.
     glfwPollEvents();
@@ -158,51 +160,42 @@ void Window::resetCamera() {
     Cam->SetAspect(float(Window::width) / float(Window::height));
 }
 
-void Window::printDOF(){
-    skeleton->PrintDOF();
-}
-
-
-// void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-//     if (action == GLFW_PRESS) {
-//         switch (key) {
-//             case GLFW_KEY_LEFT:
-//                 cloth->MoveFixedPoint(selectedFixedPoint, glm::vec3(-0.1f, 0, 0));
-//                 break;
-//             case GLFW_KEY_RIGHT:
-//                 cloth->MoveFixedPoint(selectedFixedPoint, glm::vec3(0.1f, 0, 0));
-//                 break;
-//             case GLFW_KEY_UP:
-//                 cloth->MoveFixedPoint(selectedFixedPoint, glm::vec3(0, 0.1f, 0));
-//                 break;
-//             case GLFW_KEY_DOWN:
-//                 cloth->MoveFixedPoint(selectedFixedPoint, glm::vec3(0, -0.1f, 0));
-//                 break;
-//             case GLFW_KEY_TAB:
-//                 selectedFixedPoint = (selectedFixedPoint + 1) % cloth->GetNumFixedPoints();
-//                 break;
-//         }
-//     }
-// }
 
 void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    /*
-     * TODO: Modify below to add your key callbacks.
-     */
-
-    // Check for a key press.
     if (action == GLFW_PRESS) {
         switch (key) {
+            case GLFW_KEY_LEFT:
+                cloth->MoveFixedPoint(selectedFixedPoint, glm::vec3(-0.1f, 0, 0));
+                std::cout << "pressed LEFT key" << std::endl;
+
+                break;
+            case GLFW_KEY_RIGHT:
+                cloth->MoveFixedPoint(selectedFixedPoint, glm::vec3(0.1f, 0, 0));
+                std::cout << "pressed RIGHT key" << std::endl;
+
+                break;
+            case GLFW_KEY_UP:
+                cloth->MoveFixedPoint(selectedFixedPoint, glm::vec3(0, 0.1f, 0));
+                std::cout << "pressed UP key" << std::endl;
+
+                break;
+            case GLFW_KEY_DOWN:
+                cloth->MoveFixedPoint(selectedFixedPoint, glm::vec3(0, -0.1f, 0));
+                std::cout << "pressed DOWN key" << std::endl;
+                break;
+            case GLFW_KEY_TAB:
+                selectedFixedPoint = (selectedFixedPoint + 1) % cloth->GetNumFixedPoints();
+                break;
             case GLFW_KEY_ESCAPE:
                 // Close the window. This causes the program to also terminate.
                 glfwSetWindowShouldClose(window, GL_TRUE);
+
                 break;
 
             case GLFW_KEY_R:
                 resetCamera();
-                break;
+                std::cout << "RESET camera" << std::endl;
 
-            default:
                 break;
         }
     }

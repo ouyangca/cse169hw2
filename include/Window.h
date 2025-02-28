@@ -4,12 +4,9 @@
 #include "Cube.h"
 #include "Shader.h"
 #include "core.h"
-#include "Skeleton.h"
-#include "Skin.h"
-#include "Animation.h"
-#include "Player.h"
-#include "Rig.h"
 #include "Cloth.h"
+#include "Ground.h"
+
 
 
 class Window {
@@ -18,21 +15,12 @@ public:
     static int width;
     static int height;
     static const char* windowTitle;
-    static bool skel_found;
-    static bool skin_found;
-    static int selectedJoint;  // Global or static variable to track the selected joint
-    static int selectedDOF;
-    static int selectedFixedPoint;
-
-    static Skeleton* skeleton;
-    static Skin* skin;
-    static Rig* rig;
-    static Animation* clip;
-    static Player* player;
-    static Cloth* cloth;
 
     // Objects to render
     static Cube* cube;
+    static Cloth* cloth;
+    static int selectedFixedPoint;
+    static Ground* ground; 
 
     // Shader Program
     static GLuint shaderProgram;
@@ -41,9 +29,6 @@ public:
     static bool initializeProgram();
     static bool initializeObjects();
     static void cleanUp();
-    static void printDOF();
-
-
 
     // for the Window
     static GLFWwindow* createWindow(int width, int height);
