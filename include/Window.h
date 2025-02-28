@@ -15,12 +15,15 @@ public:
     static int width;
     static int height;
     static const char* windowTitle;
+    
 
     // Objects to render
     static Cube* cube;
     static Cloth* cloth;
     static int selectedFixedPoint;
     static Ground* ground; 
+    static float windSpeed;
+
 
     // Shader Program
     static GLuint shaderProgram;

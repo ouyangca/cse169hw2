@@ -13,6 +13,7 @@
 class Cloth {
 public:
     int width, height;  // Grid dimensions
+    float windSpeed;
     std::vector<Particle> particles;
     std::vector<SpringDamper> springs;
     std::vector<Tri> triangles;
@@ -48,6 +49,13 @@ public:
 
     // Render the cloth using OpenGL
     void Draw(const glm::mat4& viewProjMtx, GLuint shaderProgram);
+
+    void SetWindSpeed(float speed);
+
+
+    void ReleaseAllParticles();  // Function to make all particles non-fixed
+
+
 
 private:
     // Helper function to convert 2D grid indices into 1D array index

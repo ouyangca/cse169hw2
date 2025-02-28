@@ -4,7 +4,7 @@
 
 
 Cloth::Cloth(int w, int h, float mass, float stiffness, float damping, float wind)
-    : width(w), height(h) {
+    : width(w), height(h), windSpeed(wind) {
     Initialize();
     SetupMesh();
 }
@@ -20,7 +20,7 @@ void Cloth::Initialize() {
     // Create particles
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            glm::vec3 position = glm::vec3(x * 0.1f, height * 0.1f - y * 0.1f, 0.0f);
+            glm::vec3 position = glm::vec3(x * 0.1f, height * 0.1f - y * 0.1f,  (rand() % 10) * 0.001f);
             bool fixed = (y == 0);
 
             particles.emplace_back(position, 1.0f, fixed);
@@ -35,8 +35,8 @@ void Cloth::Initialize() {
             if (y < height - 1) // Vertical
                 springs.emplace_back(&particles[GetIndex(x, y)], &particles[GetIndex(x, y + 1)], 2500.0f, 24.0f);
             if (x < width - 1 && y < height - 1) { // Diagonal (shear)
-                springs.emplace_back(&particles[GetIndex(x, y)], &particles[GetIndex(x + 1, y + 1)], 5.0f, 0.5f);
-                springs.emplace_back(&particles[GetIndex(x + 1, y)], &particles[GetIndex(x, y + 1)], 5.0f, 0.5f);
+                springs.emplace_back(&particles[GetIndex(x, y)], &particles[GetIndex(x + 1, y + 1)],2500.0f, 24.0f);
+                springs.emplace_back(&particles[GetIndex(x + 1, y)], &particles[GetIndex(x, y + 1)], 2500.0f, 24.0f);
             }
         }
     }
@@ -91,7 +91,7 @@ void Cloth::SetupMesh() {
 
     for (const auto& tri : triangles) {
         glm::vec3 normal = tri.ComputeNormal();
-        std::cout << "Triangle normal: (" << normal.x << ", " << normal.y << ", " << normal.z << ")" << std::endl;
+        // std::cout << "Triangle normal: (" << normal.x << ", " << normal.y << ", " << normal.z << ")" << std::endl;
         // Use precomputed indices for the particles
         temp_normals[tri.p1_index] += normal;
         temp_normals[tri.p2_index] += normal;
@@ -145,22 +145,21 @@ void Cloth::Update(float deltaTime) {
 
 
     glm::vec3 force(0.0f, -0.0f, 0.0f);  // Gravity pulls downward
-    glm::vec3 windDirection(1.0f, 1.0f, 0.0f); // Wind blowing in the +X direction
-    float windSpeed = 10/60.0f; // Adjustable wind speed
+    glm::vec3 windDirection(1.0f, 0.0f, 0.0f); // Wind blowing in the +X direction
 
     // Call ApplyForces to apply physics
     for (auto& t : triangles) {
-        t.ApplyAerodynamicForce(windDirection * windSpeed, 1.0f);
+        t.ApplyAerodynamicForce(windDirection * (windSpeed), 1.0f);
     }
 
     for (auto& p : particles) {
         p.Update(deltaTime);
     }
 
-    for (auto& p : particles) {
-        std::cout << "Particle force: (" << p.force.x << ", " << p.force.y << ", " << p.force.z << ")" << std::endl;
-        std::cout << "Particle position: (" << p.position.x << ", " << p.position.y << ", " << p.position.z << ")" << std::endl;
-    }
+    // for (auto& p : particles) {
+    //     std::cout << "Particle force: (" << p.force.x << ", " << p.force.y << ", " << p.force.z << ")" << std::endl;
+    //     std::cout << "Particle position: (" << p.position.x << ", " << p.position.y << ", " << p.position.z << ")" << std::endl;
+    // }
 
 
 
@@ -295,4 +294,17 @@ int Cloth::GetNumFixedPoints() const {
         if (p.isFixed) count++;
     }
     return count;
+}
+
+void Cloth::SetWindSpeed(float speed) {
+    windSpeed = glm::max(0.0f, speed);  // Ensure wind speed is not negative
+    std::cout << "Wind Speed Updated: " << windSpeed << std::endl;
+}
+
+
+void Cloth::ReleaseAllParticles() {
+    for (auto& p : particles) {
+        p.isFixed = false;  // Set all particles to non-fixed
+    }
+    std::cout << "All particles are now free-moving!" << std::endl;
 }

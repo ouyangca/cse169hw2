@@ -11,6 +11,8 @@ Cube* Window::cube;
 Cloth* Window::cloth;
 int Window::selectedFixedPoint = 0;
 Ground* Window::ground;
+float Window::windSpeed = 1.0f;  
+
 
 
 // Camera Properties
@@ -40,7 +42,7 @@ bool Window::initializeProgram() {
 bool Window::initializeObjects() {
     // Create a cube
     // cube = new Cube();
-    cloth = new Cloth(20, 20, 0.1f, 500.0f, 1.0f, 0.2f);
+    cloth = new Cloth(20, 20, 0.1f, 500.0f, 1.0f, 10.0f);
     ground = new Ground(100.0f);
 
     // cube = new Cube(glm::vec3(-1, 0, -2), glm::vec3(1, 1, 1));
@@ -196,6 +198,24 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
                 resetCamera();
                 std::cout << "RESET camera" << std::endl;
 
+                break;
+
+            case GLFW_KEY_B:   // Increase wind speed
+                windSpeed += 20.0f;
+                cloth->SetWindSpeed(windSpeed);  // Call new function
+                break;
+
+            case GLFW_KEY_A:  // Decrease wind speed
+                windSpeed = glm::max(0.0f, windSpeed - 5.0f);
+                cloth->SetWindSpeed(windSpeed);  // Call new function
+                break;
+
+            case GLFW_KEY_C:  // reset wind speed
+                cloth->SetWindSpeed(0.0f);  // Call new function
+                break;
+
+            case GLFW_KEY_F: // Release all fixed particles
+                cloth->ReleaseAllParticles();
                 break;
         }
     }
