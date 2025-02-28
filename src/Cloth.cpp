@@ -73,10 +73,7 @@ void Cloth::Initialize() {
 
 void Cloth::ApplyForces(const glm::vec3& gravity, const glm::vec3& windDirection, float windSpeed) {
 
-    // Apply aerodynamic forces using Tri
-    for (auto& t : triangles) {
-        t.ApplyAerodynamicForce(windDirection * windSpeed, 0.2f);
-    }
+    
 }
 
 void Cloth::SetupMesh() {
@@ -149,10 +146,12 @@ void Cloth::Update(float deltaTime) {
 
     glm::vec3 force(0.0f, -0.0f, 0.0f);  // Gravity pulls downward
     glm::vec3 windDirection(1.0f, 1.0f, 0.0f); // Wind blowing in the +X direction
-    float windSpeed = 0.000001f; // Adjustable wind speed
+    float windSpeed = 10/60.0f; // Adjustable wind speed
 
     // Call ApplyForces to apply physics
-    ApplyForces(force, windDirection, windSpeed);
+    for (auto& t : triangles) {
+        t.ApplyAerodynamicForce(windDirection * windSpeed, 1.0f);
+    }
 
     for (auto& p : particles) {
         p.Update(deltaTime);

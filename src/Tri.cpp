@@ -37,7 +37,6 @@ void Tri::ApplyAerodynamicForce(const glm::vec3& windVelocity, float dragCoeffic
     float projectedArea = baseArea * glm::dot(v_relative_dir, normal);
     float forceMag = -0.5f * airDensity * v_relative_mag * v_relative_mag * dragCoefficient * projectedArea;
     glm::vec3 force = forceMag * normal;
-    forceMag = glm::clamp(forceMag, -50.0f, 50.0f);
 
 
     p1->ApplyForce(force / 3.0f);
